@@ -7,14 +7,14 @@
    예: 진동공학, 수치해석, 시스템제어
 2. 입력한 과목에 맞게 study_questions 폴더가 자동으로 생깁니다.
 3. 각 과목의 problems 폴더에는 문제 사진을 넣어주세요.
-4. 각 과목의 answers 폴더에는 같은 이름의 해설 사진을 넣어주세요.
+4. 각 과목의 answers 폴더에는 꼭 문제와 🔥"같은 이름"🔥의 해설 사진을 넣어주세요.
 
 예시:
 study_questions/진동공학/problems/q001.png
 study_questions/진동공학/answers/q001.png
 
 주의:
-- 사진은 png 또는 gif 파일만 넣어주세요. (jpeg 파일은 tk.PhotoImage가 표시하지 못할 수 있습니다.)
+- 사진은 png, gif, jpg, jpeg 파일 형식이 가능해요!
 - 프로그램을 실행한 적이 있어 이미 폴더가 있으면, 폴더를 새로 만들지 않고 그대로 사용하니 걱정하지 마세요~~~~
 """
 
@@ -22,9 +22,9 @@ import os
 import json
 import random
 import tkinter as tk
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox #사용자에게 처음 과목 목록 입력받을 때 GUI 구성 위해 import하는 라이브러리~
 from datetime import date
-
+from PIL import Image, ImageTk
 
 # 폴더와 파일 이름을 변수로 저장한다.
 question_folder = "study_questions" #폴더 구조의 제일 상단에 위치하는, 상위 폴더의 이름은 study_questions
@@ -147,7 +147,12 @@ def get_image_files(folder_path):
 
     for file_name in os.listdir(folder_path):
         lower_name = file_name.lower()
-        if lower_name.endswith(".png") or lower_name.endswith(".gif"):
+        if (
+            lower_name.endswith(".png")
+    or lower_name.endswith(".gif")
+    or lower_name.endswith(".jpg")
+    or lower_name.endswith(".jpeg")
+    ):
             image_files.append(file_name)
 
     return image_files
@@ -184,10 +189,24 @@ def get_random_question():
 
 
 # 이미지를 화면에 보여준다.
+# 최종적으로 show_image 함수를 이렇게 수정하면 문제 사진이 너무 커도 GUI 창 안에 들어오게 줄어들고, 원본 비율도 유지가능!!
 def show_image(image_path):
     global current_image
 
-    current_image = tk.PhotoImage(file=image_path)
+    # 이미지 열기
+    img = Image.open(image_path)
+
+    # GUI 안에 들어갈 최대 크기 설정
+    max_width = 760
+    max_height = 420
+
+    # 원본 비율을 유지하면서 크기 조절
+    img.thumbnail((max_width, max_height))
+
+    # tkinter에서 보여줄 수 있는 이미지로 변환
+    current_image = ImageTk.PhotoImage(img)
+
+    # 화면에 이미지 표시
     image_label.config(image=current_image, text="")
 
 
@@ -293,7 +312,8 @@ all_button = tk.Button(window, text="전체 과목 랜덤", width=20, command=la
 all_button.pack(pady=5)
 
 # 이미지를 보여줄 영역이다.
-image_label = tk.Label(window, text="여기에 문제 이미지가 표시됩니다.", width=90, height=25, bg="white", relief="solid")
+# width=90, height=25는 픽셀 단위가 아니라 글자 기준 크기라서, 이미지 표시할 때 오히려 헷갈릴 수 있으니 빼고 수정하였다!
+image_label = tk.Label(window, text="여기에 문제 이미지가 표시됩니다.", bg="white", relief="solid")
 image_label.pack(padx=10, pady=10)
 
 # 기능 버튼들을 담을 프레임이다.
